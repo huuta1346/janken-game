@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>じゃんけんゲーム with BGM</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Arial", sans-serif;
+      background-color: black;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px;
+      color: white;
+    }
+
+    .buttons button, #bgmToggleBtn {
+      font-size: 1.2em;
+      margin: 10px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .character img {
+      margin-top: 30px;
+      width: 250px;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BGMの音声ファイル（自動再生なし／クリックで再生） -->
+  <audio id="bgm" src="bgm.mp3" loop></audio>
+
+  <!-- 背景エフェクト -->
+  <div id="particles-js"></div>
+
+  <main>
+    <h1>じゃんけんしよっ✊✋✌️</h1>
+
+    <div class="buttons">
+      <button onclick="play(0)">グー ✊</button>
+      <button onclick="play(1)">チョキ ✌️</button>
+      <button onclick="play(2)">パー ✋</button>
+    </div>
+
+    <div class="result" id="resultArea"></div>
+    <div class="score" id="scoreArea">勝ち: 0 / 負け: 0 / あいこ: 0</div>
+
+    <div class="character">
+      <img id="characterImage" src="normal.png" alt="キャラ" />
+    </div>
+
+    <button id="bgmToggleBtn" onclick="toggleBGM()">♪ ミュート</button>
+  </main>
+
+  <!-- じゃんけん処理 -->
+  <script>
+    const hands = ['グー ✊', 'チョキ ✌️', 'パー ✋'];
+    let win = 0, lose = 0, draw = 0;
+
+    function play(playerHand) {
+      const cpuHand = Math.floor(Math.random() * 3);
+      const resultArea = document.getElementById("resultArea");
+      const scoreArea = document.getElementById("scoreArea");
+      const characterImage = document.getElementById("characterImage");
+
+      let resultText = `あなた：${hands[playerHand]}<br>CPU：${hands[cpuHand]}<br>`;
+      const result = (playerHand - cpuHand + 3) % 3;
+
+      if (result === 0) {
+        resultText += "あいこだよ！😲";
+        draw++;
+        characterImage.src = "normal.png";
+      } else if (result === 1) {
+        resultText += "あなたの負け…😢";
+        lose++;
+        characterImage.src = "lose.png";
+      } else {
+        resultText += "あなたの勝ち！🎉";
+        win++;
+        characterImage.src = "win.png";
+      }
+
+      resultArea.innerHTML = resultText;
+      scoreArea.textContent = `勝ち: ${win} / 負け: ${lose} / あいこ: ${draw}`;
+    }
+
+    function toggleBGM() {
+      const bgm = document.getElementById("bgm");
+      const button = document.getElementById("bgmToggleBtn");
+      if (bgm.muted) {
+        bgm.muted = false;
+        button.textContent = "♪ ミュート";
+      } else {
+        bgm.muted = true;
+        button.textContent = "♪ ミュート解除";
+      }
+    }
+
+    // ページクリックでBGMを再生（自動再生ブロック対策）
+    window.addEventListener("click", () => {
+      const bgm = document.getElementById("bgm");
+      if (bgm && bgm.paused) {
+        bgm.play().catch(e => console.log("BGM再生エラー", e));
+      }
+    });
+  </script>
+
+  <!-- particles.js 読み込み＆初期化 -->
+  <script src="particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 80 },
+        "color": { "value": "#ffffff" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5 },
+        "size": { "value": 3 },
+        "move": { "enable": true, "speed": 1 }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": { "enable": true, "mode": "repulse" }
+        }
+      },
+      "retina_detect": true
+    });
+  </script>
+
+</body>
+</html>
